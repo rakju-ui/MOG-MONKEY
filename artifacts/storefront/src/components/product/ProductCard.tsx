@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       <Link href={`/products/${product.id}`}>
         <div
-          className="relative overflow-hidden rounded-xl bg-muted/30 aspect-square mb-3 cursor-pointer"
+          className="relative overflow-hidden rounded-xl bg-muted/40 aspect-square mb-3 cursor-pointer"
           onMouseEnter={() => { setHovered(true); if (product.images.length > 1) setImgIdx(1); }}
           onMouseLeave={() => { setHovered(false); setImgIdx(0); }}
         >
@@ -71,25 +71,30 @@ export function ProductCard({ product }: ProductCardProps) {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
+
           {discount > 0 && (
-            <Badge className="absolute top-2.5 left-2.5 bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5">
+            <Badge className="absolute top-2.5 left-2.5 bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 shadow-sm">
               -{discount}%
             </Badge>
           )}
+
           {!product.inStock && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
-              <span className="text-sm font-medium text-muted-foreground">Out of Stock</span>
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] flex items-center justify-center">
+              <span className="text-xs font-medium text-muted-foreground bg-background/80 px-3 py-1.5 rounded-full border border-border">
+                Out of Stock
+              </span>
             </div>
           )}
+
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 8 }}
-            transition={{ duration: 0.2 }}
-            className="absolute bottom-3 left-3 right-3"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: hovered && product.inStock ? 1 : 0, y: hovered && product.inStock ? 0 : 6 }}
+            transition={{ duration: 0.18 }}
+            className="absolute bottom-2.5 left-2.5 right-2.5"
           >
             <Button
               size="sm"
-              className="w-full gap-1.5 text-xs shadow-lg"
+              className="w-full gap-1.5 text-xs shadow-lg h-8"
               onClick={handleAddToCart}
               disabled={!product.inStock || addToCart.isPending}
               data-testid={`button-add-to-cart-${product.id}`}
@@ -99,18 +104,18 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
           </motion.div>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground mb-0.5 truncate">{product.name}</p>
-          <h3 className="text-sm font-medium text-foreground mb-1 leading-snug">{product.name}</h3>
-          <div className="flex items-center justify-between">
+
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2">{product.name}</h3>
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-semibold text-foreground">${product.price.toFixed(2)}</span>
               {product.compareAtPrice && (
                 <span className="text-xs text-muted-foreground line-through">${product.compareAtPrice.toFixed(2)}</span>
               )}
             </div>
-            {product.averageRating && (
-              <div className="flex items-center gap-0.5 text-xs text-muted-foreground">
+            {product.averageRating != null && product.averageRating > 0 && (
+              <div className="flex items-center gap-0.5 text-xs text-muted-foreground flex-shrink-0">
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                 <span>{product.averageRating.toFixed(1)}</span>
               </div>

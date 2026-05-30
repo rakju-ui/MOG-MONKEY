@@ -8,7 +8,6 @@ import { useTheme } from "@/components/ui/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useGetCart } from "@workspace/api-client-react";
 import { getCartSessionId } from "@/lib/cart-session";
 
@@ -34,7 +33,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px]">
-              <VisuallyHidden><SheetTitle>Navigation</SheetTitle></VisuallyHidden>
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
               <nav className="flex flex-col gap-4 mt-8">
                 <Link href="/" className="text-lg font-medium">Home</Link>
                 <Link href="/products" className="text-lg font-medium">Shop</Link>
