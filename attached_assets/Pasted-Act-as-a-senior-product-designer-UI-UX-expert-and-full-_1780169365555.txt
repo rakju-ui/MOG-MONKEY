@@ -1,0 +1,187 @@
+Act as a senior product designer, UI/UX expert, and full-stack ecommerce developer.
+
+Create a modern, clean, minimalist ecommerce website.
+
+The goal is not to create an experimental or artistic website.
+
+The goal is to create a beautiful ecommerce website that feels trustworthy, premium, and easy to use.
+
+Design Principles:
+
+- Minimalist
+- Modern
+- Clean
+- Professional
+- Premium
+- Conversion-focused
+- Fast and responsive
+
+Avoid:
+
+- Overly complex layouts
+- Excessive animations
+- Glassmorphism everywhere
+- Futuristic aesthetics
+- Neon colors
+- Gaming-inspired UI
+- Visual clutter
+
+Theme System:
+
+Create both Light Mode and Dark Mode.
+
+Light Mode:
+- Soft white backgrounds
+- Neutral grays
+- High readability
+- Clean shadows
+
+Dark Mode:
+- Rich charcoal backgrounds
+- Soft contrast
+- Elegant appearance
+- No pure black backgrounds
+
+Users can switch themes manually.
+
+Remember theme preference using local storage.
+
+Color Palette:
+
+- Neutral
+- Timeless
+- Minimal
+
+Typography:
+
+- Modern sans-serif
+- Excellent readability
+- Clear hierarchy
+- Consistent spacing
+
+Layout:
+
+Header:
+- Logo
+- Search
+- Categories
+- Wishlist
+- Cart
+- Theme toggle
+- User account
+
+Homepage:
+
+1. Hero Section
+- Clean product showcase
+- Strong headline
+- Call-to-action
+
+2. Featured Products
+- Responsive product grid
+
+3. Categories
+- Modern category cards
+
+4. Best Sellers
+
+5. Customer Reviews
+
+6. Newsletter Section
+
+7. Footer
+
+Product Listing Page:
+
+- Grid layout
+- Filters
+- Sorting
+- Search
+- Pagination
+
+Product Detail Page:
+
+- Large product images
+- Image gallery
+- Product information
+- Variant selection
+- Quantity selector
+- Add to cart
+- Wishlist
+- Reviews
+- Related products
+
+Cart:
+
+- Slide-out cart drawer
+- Cart page
+- Quantity management
+- Price summary
+
+Checkout:
+
+- Clean multi-step checkout
+- Shipping
+- Payment
+- Order review
+
+User Dashboard:
+
+- Orders
+- Wishlist
+- Addresses
+- Account settings
+
+Admin Dashboard:
+
+- Product management
+- Inventory management
+- Orders
+- Customers
+- Analytics
+
+Animations:
+
+Use only subtle animations.
+
+Examples:
+- Button hover states
+- Smooth page transitions
+- Product image hover effects
+- Fade-ins on scroll
+
+No dramatic animations.
+
+Tech Stack:
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Zustand
+- React Query
+- Stripe
+- PostgreSQL
+- Prisma
+
+Requirements:
+
+- Mobile-first
+- Responsive
+- SEO optimized
+- Accessibility compliant
+- Fast loading
+- Production ready
+
+Before generating code:
+
+1. Create complete design system.
+2. Define color tokens for both themes.
+3. Define spacing system.
+4. Define component architecture.
+5. Define folder structure.
+6. Define database schema.
+7. Define API structure.
+8. Then generate the application step by step.
+
+The final result should feel comparable to modern stores built by Shopify Plus agencies and premium DTC brands.

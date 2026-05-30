@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Ecommerce API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Product operations
+  - name: categories
+    description: Category operations
+  - name: cart
+    description: Cart operations
+  - name: orders
+    description: Order operations
+  - name: users
+    description: User operations
+  - name: reviews
+    description: Review operations
+  - name: wishlist
+    description: Wishlist operations
+  - name: admin
+    description: Admin operations
+  - name: analytics
+    description: Analytics operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +41,982 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Products ─────────────────────────────────────────────────────────────
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List products
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 24 }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [newest, price_asc, price_desc, popular, rating] }
+        - name: minPrice
+          in: query
+          schema: { type: number }
+        - name: maxPrice
+          in: query
+          schema: { type: number }
+        - name: inStock
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+    post:
+      operationId: createProduct
+      tags: [products, admin]
+      summary: Create product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /products/featured:
+    get:
+      operationId: listFeaturedProducts
+      tags: [products]
+      summary: List featured products
+      responses:
+        "200":
+          description: Featured products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /products/best-sellers:
+    get:
+      operationId: listBestSellers
+      tags: [products]
+      summary: List best selling products
+      responses:
+        "200":
+          description: Best sellers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProduct
+      tags: [products, admin]
+      summary: Update product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      operationId: deleteProduct
+      tags: [products, admin]
+      summary: Delete product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /products/{id}/related:
+    get:
+      operationId: listRelatedProducts
+      tags: [products]
+      summary: List related products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Related products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  # ─── Categories ───────────────────────────────────────────────────────────
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      operationId: createCategory
+      tags: [categories, admin]
+      summary: Create category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+  # ─── Cart ─────────────────────────────────────────────────────────────────
+  /cart:
+    get:
+      operationId: getCart
+      tags: [cart]
+      summary: Get current cart
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /cart/items:
+    post:
+      operationId: addToCart
+      tags: [cart]
+      summary: Add item to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemInput"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /cart/items/{itemId}:
+    patch:
+      operationId: updateCartItem
+      tags: [cart]
+      summary: Update cart item quantity
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemUpdate"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    delete:
+      operationId: removeFromCart
+      tags: [cart]
+      summary: Remove item from cart
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /cart/clear:
+    delete:
+      operationId: clearCart
+      tags: [cart]
+      summary: Clear cart
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Empty cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  # ─── Orders ───────────────────────────────────────────────────────────────
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List orders for a user
+      parameters:
+        - name: userId
+          in: query
+          schema: { type: integer }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderListResponse"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create order from cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders, admin]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdate"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  # ─── Users ────────────────────────────────────────────────────────────────
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users, admin]
+      summary: List users (admin)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create / register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/addresses:
+    get:
+      operationId: listUserAddresses
+      tags: [users]
+      summary: List user addresses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Addresses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Address"
+    post:
+      operationId: createUserAddress
+      tags: [users]
+      summary: Add user address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressInput"
+      responses:
+        "201":
+          description: Created address
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+
+  # ─── Reviews ──────────────────────────────────────────────────────────────
+  /products/{id}/reviews:
+    get:
+      operationId: listProductReviews
+      tags: [reviews]
+      summary: List reviews for a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Create a review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Created review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  # ─── Wishlist ─────────────────────────────────────────────────────────────
+  /users/{id}/wishlist:
+    get:
+      operationId: getWishlist
+      tags: [wishlist]
+      summary: Get user wishlist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Wishlist items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WishlistItem"
+    post:
+      operationId: addToWishlist
+      tags: [wishlist]
+      summary: Add product to wishlist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WishlistItemInput"
+      responses:
+        "201":
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WishlistItem"
+
+  /users/{id}/wishlist/{productId}:
+    delete:
+      operationId: removeFromWishlist
+      tags: [wishlist]
+      summary: Remove product from wishlist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: productId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Removed
+
+  # ─── Analytics / Admin ────────────────────────────────────────────────────
+  /admin/analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics, admin]
+      summary: Get store analytics summary
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
+  /admin/analytics/revenue:
+    get:
+      operationId: getRevenueChart
+      tags: [analytics, admin]
+      summary: Get revenue over time
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [7d, 30d, 90d, 1y], default: 30d }
+      responses:
+        "200":
+          description: Revenue data points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RevenueDataPoint"
+
+  /admin/orders:
+    get:
+      operationId: listAdminOrders
+      tags: [orders, admin]
+      summary: List all orders (admin)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderListResponse"
+
+# ─── Schemas ────────────────────────────────────────────────────────────────
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    # ── Product ──
+    Product:
+      type: object
+      required: [id, name, slug, price, images, categoryId, inStock, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: ["string", "null"] }
+        price: { type: number }
+        compareAtPrice: { type: ["number", "null"] }
+        images: { type: array, items: { type: string } }
+        categoryId: { type: integer }
+        categoryName: { type: ["string", "null"] }
+        tags: { type: array, items: { type: string } }
+        variants: { type: array, items: { $ref: "#/components/schemas/ProductVariant" } }
+        inStock: { type: boolean }
+        stockCount: { type: ["integer", "null"] }
+        isFeatured: { type: boolean }
+        averageRating: { type: ["number", "null"] }
+        reviewCount: { type: integer }
+        createdAt: { type: string }
+
+    ProductVariant:
+      type: object
+      required: [id, name, value]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        value: { type: string }
+        priceModifier: { type: ["number", "null"] }
+        stockCount: { type: ["integer", "null"] }
+
+    ProductInput:
+      type: object
+      required: [name, price, categoryId, images]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        price: { type: number }
+        compareAtPrice: { type: number }
+        images: { type: array, items: { type: string } }
+        categoryId: { type: integer }
+        tags: { type: array, items: { type: string } }
+        inStock: { type: boolean }
+        stockCount: { type: integer }
+        isFeatured: { type: boolean }
+
+    ProductUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        compareAtPrice: { type: number }
+        images: { type: array, items: { type: string } }
+        categoryId: { type: integer }
+        tags: { type: array, items: { type: string } }
+        inStock: { type: boolean }
+        stockCount: { type: integer }
+        isFeatured: { type: boolean }
+
+    ProductListResponse:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items: { type: array, items: { $ref: "#/components/schemas/Product" } }
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    # ── Category ──
+    Category:
+      type: object
+      required: [id, name, slug]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: ["string", "null"] }
+        imageUrl: { type: ["string", "null"] }
+        productCount: { type: integer }
+
+    CategoryInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        imageUrl: { type: string }
+
+    # ── Cart ──
+    Cart:
+      type: object
+      required: [id, sessionId, items, subtotal, itemCount]
+      properties:
+        id: { type: integer }
+        sessionId: { type: string }
+        userId: { type: ["integer", "null"] }
+        items: { type: array, items: { $ref: "#/components/schemas/CartItem" } }
+        subtotal: { type: number }
+        itemCount: { type: integer }
+
+    CartItem:
+      type: object
+      required: [id, productId, productName, productImage, price, quantity]
+      properties:
+        id: { type: integer }
+        productId: { type: integer }
+        productName: { type: string }
+        productImage: { type: ["string", "null"] }
+        price: { type: number }
+        quantity: { type: integer }
+        variantId: { type: ["integer", "null"] }
+        variantLabel: { type: ["string", "null"] }
+
+    CartItemInput:
+      type: object
+      required: [sessionId, productId, quantity]
+      properties:
+        sessionId: { type: string }
+        productId: { type: integer }
+        quantity: { type: integer }
+        variantId: { type: integer }
+
+    CartItemUpdate:
+      type: object
+      required: [quantity]
+      properties:
+        quantity: { type: integer }
+
+    # ── Order ──
+    Order:
+      type: object
+      required: [id, status, items, subtotal, total, shippingAddress, createdAt]
+      properties:
+        id: { type: integer }
+        userId: { type: ["integer", "null"] }
+        customerEmail: { type: string }
+        status: { type: string, enum: [pending, confirmed, processing, shipped, delivered, cancelled, refunded] }
+        items: { type: array, items: { $ref: "#/components/schemas/OrderItem" } }
+        subtotal: { type: number }
+        shippingCost: { type: number }
+        tax: { type: number }
+        total: { type: number }
+        shippingAddress: { $ref: "#/components/schemas/Address" }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+
+    OrderItem:
+      type: object
+      required: [id, productId, productName, price, quantity]
+      properties:
+        id: { type: integer }
+        productId: { type: integer }
+        productName: { type: string }
+        productImage: { type: ["string", "null"] }
+        price: { type: number }
+        quantity: { type: integer }
+        variantLabel: { type: ["string", "null"] }
+
+    OrderInput:
+      type: object
+      required: [sessionId, customerEmail, shippingAddress]
+      properties:
+        sessionId: { type: string }
+        userId: { type: integer }
+        customerEmail: { type: string }
+        shippingAddress: { $ref: "#/components/schemas/AddressInput" }
+        notes: { type: string }
+
+    OrderStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [pending, confirmed, processing, shipped, delivered, cancelled, refunded] }
+
+    OrderListResponse:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items: { type: array, items: { $ref: "#/components/schemas/Order" } }
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    # ── User ──
+    User:
+      type: object
+      required: [id, email, createdAt]
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        firstName: { type: ["string", "null"] }
+        lastName: { type: ["string", "null"] }
+        avatarUrl: { type: ["string", "null"] }
+        role: { type: string, enum: [customer, admin] }
+        orderCount: { type: integer }
+        totalSpent: { type: number }
+        createdAt: { type: string }
+
+    UserInput:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        password: { type: string }
+
+    UserUpdate:
+      type: object
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        avatarUrl: { type: string }
+
+    UserListResponse:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items: { type: array, items: { $ref: "#/components/schemas/User" } }
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    # ── Address ──
+    Address:
+      type: object
+      required: [id, line1, city, state, postalCode, country]
+      properties:
+        id: { type: integer }
+        line1: { type: string }
+        line2: { type: ["string", "null"] }
+        city: { type: string }
+        state: { type: string }
+        postalCode: { type: string }
+        country: { type: string }
+        isDefault: { type: boolean }
+
+    AddressInput:
+      type: object
+      required: [line1, city, state, postalCode, country]
+      properties:
+        line1: { type: string }
+        line2: { type: string }
+        city: { type: string }
+        state: { type: string }
+        postalCode: { type: string }
+        country: { type: string }
+        isDefault: { type: boolean }
+
+    # ── Review ──
+    Review:
+      type: object
+      required: [id, productId, rating, createdAt]
+      properties:
+        id: { type: integer }
+        productId: { type: integer }
+        userId: { type: ["integer", "null"] }
+        authorName: { type: string }
+        rating: { type: integer }
+        title: { type: ["string", "null"] }
+        body: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+    ReviewInput:
+      type: object
+      required: [rating, authorName]
+      properties:
+        userId: { type: integer }
+        authorName: { type: string }
+        rating: { type: integer }
+        title: { type: string }
+        body: { type: string }
+
+    # ── Wishlist ──
+    WishlistItem:
+      type: object
+      required: [id, userId, product, createdAt]
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        product: { $ref: "#/components/schemas/Product" }
+        createdAt: { type: string }
+
+    WishlistItemInput:
+      type: object
+      required: [productId]
+      properties:
+        productId: { type: integer }
+
+    # ── Analytics ──
+    AnalyticsSummary:
+      type: object
+      required: [totalRevenue, totalOrders, totalCustomers, totalProducts, revenueGrowth, ordersGrowth, pendingOrders, lowStockProducts]
+      properties:
+        totalRevenue: { type: number }
+        totalOrders: { type: integer }
+        totalCustomers: { type: integer }
+        totalProducts: { type: integer }
+        revenueGrowth: { type: number }
+        ordersGrowth: { type: number }
+        pendingOrders: { type: integer }
+        lowStockProducts: { type: integer }
+
+    RevenueDataPoint:
+      type: object
+      required: [date, revenue, orders]
+      properties:
+        date: { type: string }
+        revenue: { type: number }
+        orders: { type: integer }

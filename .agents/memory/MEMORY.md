@@ -1,0 +1,2 @@
+- [MIRA storefront architecture](mira-storefront.md) — cart uses localStorage session ID, demo user=2, admin at /admin with no auth guard
+- [Express 5 param handling](express5-params.md) — wildcard routes need `/{*splat}`, params always need `Array.isArray` check before parseInt
