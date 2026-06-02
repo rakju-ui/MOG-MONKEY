@@ -39,10 +39,10 @@ function Router() {
           <Route path="/orders/:id" component={OrderDetail} />
           <Route path="/wishlist" component={Wishlist} />
           <Route path="/account" component={Account} />
-          <Route path="/admin" component={Admin} />
-          <Route path="/admin/products" component={AdminProducts} />
-          <Route path="/admin/orders" component={AdminOrders} />
-          <Route path="/admin/customers" component={AdminCustomers} />
+          <Route path="/mogger_monkey" component={Admin} />
+          <Route path="/mogger_monkey/products" component={AdminProducts} />
+          <Route path="/mogger_monkey/orders" component={AdminOrders} />
+          <Route path="/mogger_monkey/customers" component={AdminCustomers} />
           <Route component={NotFound} />
         </Switch>
       </main>

@@ -7,10 +7,10 @@ import { useGetAnalyticsSummary, useGetRevenueChart, getGetAnalyticsSummaryQuery
 import { useState } from "react";
 
 const NAV = [
-  { href: "/admin", label: "Dashboard", icon: LayoutGrid },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/mogger_monkey", label: "Dashboard", icon: LayoutGrid },
+  { href: "/mogger_monkey/products", label: "Products", icon: Package },
+  { href: "/mogger_monkey/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/mogger_monkey/customers", label: "Customers", icon: Users },
 ];
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +28,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 
         <nav className="p-2.5 flex-1 space-y-0.5">
           {NAV.map(({ href, label, icon: Icon }) => {
-            const isActive = location === href || (href !== "/admin" && location.startsWith(href));
+            const isActive = location === href || (href !== "/mogger_monkey" && location.startsWith(href));
             return (
               <Link key={href} href={href}>
                 <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
               <div className="flex items-center gap-3 text-sm bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/60 rounded-xl px-4 py-2.5">
                 <Clock className="h-4 w-4 text-amber-600 flex-shrink-0" />
                 <span className="text-amber-700 dark:text-amber-400">{summary.pendingOrders} pending order{summary.pendingOrders !== 1 ? "s" : ""}</span>
-                <Link href="/admin/orders">
+                <Link href="/mogger_monkey/orders">
                   <span className="text-amber-600 hover:text-amber-700 font-medium text-xs flex items-center gap-0.5 cursor-pointer">
                     View <ArrowRight className="h-3 w-3" />
                   </span>
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
               <div className="flex items-center gap-3 text-sm bg-red-50 dark:bg-red-900/15 border border-red-200 dark:border-red-800/60 rounded-xl px-4 py-2.5">
                 <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
                 <span className="text-red-700 dark:text-red-400">{summary.lowStockProducts} product{summary.lowStockProducts !== 1 ? "s" : ""} low on stock</span>
-                <Link href="/admin/products">
+                <Link href="/mogger_monkey/products">
                   <span className="text-red-600 hover:text-red-700 font-medium text-xs flex items-center gap-0.5 cursor-pointer">
                     View <ArrowRight className="h-3 w-3" />
                   </span>
