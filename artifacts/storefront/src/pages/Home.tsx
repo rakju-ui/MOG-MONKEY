@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowRight, ChevronRight, Star, Package, ShieldCheck, RefreshCw, Truck } from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronDown, Star, Package, ShieldCheck, RefreshCw, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -154,6 +154,21 @@ export default function Home() {
             >
               New Arrivals
             </Button>
+          </motion.div>
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.6 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-white/40 pointer-events-none"
+          >
+            <span className="text-[9px] tracking-widest uppercase font-medium">Scroll</span>
+            <motion.div
+              animate={{ y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+            >
+              <ChevronDown className="h-4 w-4" />
+            </motion.div>
           </motion.div>
         </div>
       </section>
