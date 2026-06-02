@@ -52,7 +52,8 @@ export function Header() {
               <nav className="flex flex-col gap-4 mt-8">
                 <Link href="/" className="text-lg font-medium">Home</Link>
                 <Link href="/products" className="text-lg font-medium">Shop</Link>
-                <Link href="/categories" className="text-lg font-medium">Categories</Link>
+                <Link href="/products?sort=newest" className="text-lg font-medium">New Arrivals</Link>
+                <Link href="/products?category=sale" className="text-lg font-medium">Sale</Link>
               </nav>
             </SheetContent>
           </Sheet>
