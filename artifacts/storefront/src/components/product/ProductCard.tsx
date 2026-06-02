@@ -26,6 +26,15 @@ interface ProductCardProps {
   product: Product;
 }
 
+export const cardVariant = {
+  hidden: { opacity: 0, y: 24 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
 export function ProductCard({ product }: ProductCardProps) {
   const [hovered, setHovered] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
@@ -53,9 +62,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      variants={cardVariant}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       className="group"
       data-testid={`card-product-${product.id}`}
     >
@@ -65,10 +74,12 @@ export function ProductCard({ product }: ProductCardProps) {
           onMouseEnter={() => { setHovered(true); if (product.images.length > 1) setImgIdx(1); }}
           onMouseLeave={() => { setHovered(false); setImgIdx(0); }}
         >
-          <img
+          <motion.img
             src={product.images[imgIdx] || product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover"
+            animate={{ scale: hovered ? 1.07 : 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             loading="lazy"
           />
 
@@ -87,9 +98,9 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
 
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: hovered && product.inStock ? 1 : 0, y: hovered && product.inStock ? 0 : 6 }}
-            transition={{ duration: 0.18 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: hovered && product.inStock ? 1 : 0, y: hovered && product.inStock ? 0 : 8 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="absolute bottom-2.5 left-2.5 right-2.5"
           >
             <Button
@@ -106,7 +117,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="space-y-1">
-          <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2">{product.name}</h3>
+          <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200">
+            {product.name}
+          </h3>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-semibold text-foreground">${product.price.toFixed(2)}</span>
