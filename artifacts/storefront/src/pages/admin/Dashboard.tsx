@@ -20,8 +20,9 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-background">
       <aside className="hidden md:flex w-56 flex-col border-r border-border bg-card/50 sticky top-0 h-screen">
         <div className="p-5 border-b border-border">
-          <Link href="/" className="text-base font-bold tracking-tighter text-foreground hover:text-primary transition-colors">
-            MIRA
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781547472/bfc82400-c4e0-4a10-8918-26b007952f45_uwggwx.png" alt="MØG MONKEY logo" className="h-6 w-6 object-contain" />
+            <span className="text-base font-bold tracking-tighter text-foreground">MØG MONKEY</span>
           </Link>
           <p className="text-xs text-muted-foreground mt-0.5 font-medium">Admin Panel</p>
         </div>

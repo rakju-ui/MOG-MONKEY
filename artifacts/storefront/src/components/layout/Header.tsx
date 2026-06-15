@@ -58,8 +58,9 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="text-2xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
-            MIRA
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781547472/bfc82400-c4e0-4a10-8918-26b007952f45_uwggwx.png" alt="MØG MONKEY logo" className="h-8 w-8 object-contain" />
+            <span className="text-xl font-bold tracking-tighter">MØG MONKEY</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">

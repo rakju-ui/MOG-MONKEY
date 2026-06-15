@@ -26,7 +26,7 @@ const PERKS = [
 const TESTIMONIALS = [
   { name: "Marcus T.", rating: 5, text: "Genuinely the best quality I've found online. Everything I've ordered has been exactly as described — or better." },
   { name: "Sophie K.", rating: 5, text: "The packaging alone tells you this brand cares. Products are exceptional, shipping was fast. Highly recommend." },
-  { name: "Priya S.", rating: 5, text: "I'm very picky about what I buy. MIRA is one of the very few stores I keep coming back to. Worth every penny." },
+  { name: "Priya S.", rating: 5, text: "I'm very picky about what I buy. MØG MONKEY is one of the very few stores I keep coming back to. Worth every penny." },
   { name: "James R.", rating: 4, text: "Excellent selection. The merino sweater I got is easily the nicest piece I own. Will definitely order again." },
 ];
 
