@@ -54,7 +54,7 @@ export function Footer() {
         >
           <motion.div variants={fadeUp} className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
-              <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781547472/bfc82400-c4e0-4a10-8918-26b007952f45_uwggwx.png" alt="MØG MONKEY logo" className="h-7 w-7 object-contain" />
+              <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png" alt="MØG MONKEY logo" className="h-7 w-7 object-contain" />
               <span className="text-xl font-bold tracking-tighter text-foreground">MØG MONKEY</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">

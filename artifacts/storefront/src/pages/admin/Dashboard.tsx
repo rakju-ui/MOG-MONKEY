@@ -21,7 +21,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex w-56 flex-col border-r border-border bg-card/50 sticky top-0 h-screen">
         <div className="p-5 border-b border-border">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781547472/bfc82400-c4e0-4a10-8918-26b007952f45_uwggwx.png" alt="MØG MONKEY logo" className="h-6 w-6 object-contain" />
+            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png" alt="MØG MONKEY logo" className="h-6 w-6 object-contain" />
             <span className="text-base font-bold tracking-tighter text-foreground">MØG MONKEY</span>
           </Link>
           <p className="text-xs text-muted-foreground mt-0.5 font-medium">Admin Panel</p>

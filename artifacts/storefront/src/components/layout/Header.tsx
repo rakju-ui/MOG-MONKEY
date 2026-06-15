@@ -59,7 +59,7 @@ export function Header() {
           </Sheet>
 
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781547472/bfc82400-c4e0-4a10-8918-26b007952f45_uwggwx.png" alt="MØG MONKEY logo" className="h-8 w-8 object-contain" />
+            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png" alt="MØG MONKEY logo" className="h-8 w-8 object-contain" />
             <span className="text-xl font-bold tracking-tighter">MØG MONKEY</span>
           </Link>
 
