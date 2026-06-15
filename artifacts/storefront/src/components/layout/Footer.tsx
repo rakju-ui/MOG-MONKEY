@@ -55,7 +55,7 @@ export function Footer() {
           <motion.div variants={fadeUp} className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
               <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png" alt="MØG MONKEY logo" className="h-7 w-7 object-contain" />
-              <span className="text-xl font-bold tracking-tighter text-foreground">MØG MONKEY</span>
+              <span className="text-xl font-bold tracking-tighter text-foreground">𝕄Ø𝔾 𝕄𝕆ℕ𝕂𝔼𝕐</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               Premium essentials, thoughtfully made. Quality over quantity, always.
@@ -134,7 +134,7 @@ export function Footer() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="border-t border-border pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-muted-foreground"
         >
-          <p>© {new Date().getFullYear()} MØG MONKEY. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} 𝕄Ø𝔾 𝕄𝕆ℕ𝕂𝔼𝕐. All rights reserved.</p>
           <div className="flex gap-4">
             <span className="hover:text-foreground cursor-pointer transition-colors">Privacy Policy</span>
             <span className="hover:text-foreground cursor-pointer transition-colors">Terms of Service</span>

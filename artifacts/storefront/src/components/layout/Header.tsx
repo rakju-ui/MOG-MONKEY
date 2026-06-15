@@ -131,7 +131,7 @@ export function Header() {
               alt="MØG MONKEY logo"
               className="h-8 w-8 object-contain"
             />
-            <span className="text-xl font-bold tracking-tighter">MØG MONKEY</span>
+            <span className="text-xl font-bold tracking-tighter">𝕄Ø𝔾 𝕄𝕆ℕ𝕂𝔼𝕐</span>
           </Link>
 
           {/* Desktop nav */}
