@@ -119,7 +119,7 @@ export function Header() {
             >
               <button
                 className="flex items-center gap-1 hover:text-foreground transition-colors"
-                onClick={() => setCatOpen(v => !v)}
+                onClick={() => { setLocation("/categories"); setCatOpen(false); }}
               >
                 Categories
                 <motion.span

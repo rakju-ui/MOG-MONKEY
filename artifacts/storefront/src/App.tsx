@@ -21,6 +21,7 @@ import Admin from "@/pages/admin/Dashboard";
 import AdminProducts from "@/pages/admin/Products";
 import AdminOrders from "@/pages/admin/Orders";
 import AdminCustomers from "@/pages/admin/Customers";
+import Categories from "@/pages/Categories";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -71,6 +72,7 @@ function AnimatedRoutes() {
       >
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/categories" component={Categories} />
           <Route path="/products" component={Products} />
           <Route path="/products/:id" component={ProductDetail} />
           <Route path="/cart" component={CartPage} />
