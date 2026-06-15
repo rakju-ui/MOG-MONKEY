@@ -3,9 +3,7 @@ import { useSearch } from "wouter";
 import { SlidersHorizontal, Search, X, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +22,6 @@ export default function Products() {
   const [submittedSearch, setSubmittedSearch] = useState(() => getParam("search"));
   const [sort, setSort] = useState(() => getParam("sort") || "newest");
   const [category, setCategory] = useState(() => getParam("category"));
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
@@ -44,8 +41,6 @@ export default function Products() {
       search: submittedSearch || undefined,
       sort: sort as any,
       category: category || undefined,
-      minPrice: priceRange[0] || undefined,
-      maxPrice: priceRange[1] < 1000 ? priceRange[1] : undefined,
       inStock: inStockOnly || undefined,
     },
     { query: { queryKey: getListProductsQueryKey({ page, limit: 24, search: submittedSearch || undefined, sort: sort as any, category: category || undefined }) } }
@@ -60,14 +55,13 @@ export default function Products() {
   };
 
   const clearAll = () => {
-    setCategory(""); setInStockOnly(false); setPriceRange([0, 1000]);
+    setCategory(""); setInStockOnly(false);
     setSubmittedSearch(""); setSearchInput(""); setPage(1);
   };
 
   const activeFilters = [
     category && categories?.find(c => c.slug === category)?.name,
     inStockOnly && "In Stock",
-    priceRange[1] < 1000 && `Under $${priceRange[1]}`,
     submittedSearch && `"${submittedSearch}"`,
   ].filter(Boolean) as string[];
 
@@ -99,21 +93,23 @@ export default function Products() {
       <Separator />
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Price Range</p>
-        <Slider
-          min={0} max={1000} step={10}
-          value={priceRange}
-          onValueChange={v => setPriceRange(v as [number, number])}
-          className="mb-4"
-        />
-        <div className="flex items-center justify-between">
-          <div className="h-8 px-3 rounded-md border border-border bg-muted/40 flex items-center text-xs text-foreground font-medium">
-            ${priceRange[0]}
-          </div>
-          <div className="h-px w-4 bg-border" />
-          <div className="h-8 px-3 rounded-md border border-border bg-muted/40 flex items-center text-xs text-foreground font-medium">
-            {priceRange[1] >= 1000 ? "Any" : `$${priceRange[1]}`}
-          </div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Sort By</p>
+        <div className="space-y-0.5">
+          {[
+            { value: "newest", label: "Newest first" },
+            { value: "popular", label: "Most popular" },
+            { value: "price_asc", label: "Price: Low to High" },
+            { value: "price_desc", label: "Price: High to Low" },
+            { value: "rating", label: "Top rated" },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => { setSort(opt.value); setPage(1); }}
+              className={`flex items-center w-full text-left text-sm py-1.5 px-2.5 rounded-lg transition-colors ${sort === opt.value ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -196,20 +192,6 @@ export default function Products() {
               </SheetContent>
             </Sheet>
 
-            {/* Sort */}
-            <Select value={sort} onValueChange={v => { setSort(v); setPage(1); }}>
-              <SelectTrigger className="w-44 text-sm bg-background border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest first</SelectItem>
-                <SelectItem value="popular">Most popular</SelectItem>
-                <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                <SelectItem value="price_desc">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Top rated</SelectItem>
-              </SelectContent>
-            </Select>
-
             {/* Active filter chips */}
             {activeFilters.map(f => (
               <Badge key={f} variant="secondary" className="gap-1.5 pr-1 text-xs font-normal">
@@ -218,7 +200,6 @@ export default function Products() {
                   className="rounded-sm hover:bg-foreground/10 p-0.5"
                   onClick={() => {
                     if (f === "In Stock") setInStockOnly(false);
-                    else if (f.startsWith("Under")) setPriceRange([0, 1000]);
                     else if (f.startsWith('"')) { setSubmittedSearch(""); setSearchInput(""); }
                     else setCategory("");
                     setPage(1);
