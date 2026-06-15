@@ -34,6 +34,10 @@ export default function Products() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page]);
+
   const { data: categories } = useListCategories();
   const { data, isLoading } = useListProducts(
     {
@@ -262,7 +266,7 @@ export default function Products() {
                       variant="outline"
                       size="sm"
                       disabled={page === 1}
-                      onClick={() => { setPage(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      onClick={() => setPage(p => p - 1)}
                     >
                       Previous
                     </Button>
@@ -270,7 +274,7 @@ export default function Products() {
                       {Array.from({ length: totalPages }).map((_, i) => (
                         <button
                           key={i}
-                          onClick={() => { setPage(i + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                          onClick={() => setPage(i + 1)}
                           className={`h-8 w-8 rounded-lg text-sm transition-colors ${page === i + 1 ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:bg-muted"}`}
                         >
                           {i + 1}
@@ -281,7 +285,7 @@ export default function Products() {
                       variant="outline"
                       size="sm"
                       disabled={page === totalPages}
-                      onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      onClick={() => setPage(p => p + 1)}
                     >
                       Next
                     </Button>
