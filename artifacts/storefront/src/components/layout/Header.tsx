@@ -17,6 +17,7 @@ export function Header() {
   const [, setLocation] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
+  const [mobileCatOpen, setMobileCatOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const sessionId = getCartSessionId();
 
@@ -64,23 +65,58 @@ export function Header() {
             <SheetContent side="left" className="w-[300px]">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <nav className="flex flex-col gap-1 mt-8">
-                <Link href="/" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors">Home</Link>
-                <Link href="/products" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors">Shop All</Link>
-                <div className="mt-2 mb-1 px-2">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Categories</p>
-                </div>
-                {(categories ?? []).map(cat => (
+                <Link href="/" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Home</Link>
+                <Link href="/products" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Shop</Link>
+
+                {/* Categories row: link + expand arrow */}
+                <div className="flex items-center rounded-lg hover:bg-muted transition-colors overflow-hidden">
                   <Link
-                    key={cat.id}
-                    href={`/products?category=${cat.slug}`}
-                    className="text-base font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                    href="/categories"
+                    className="flex-1 text-lg font-medium px-3 py-2.5"
                   >
-                    {cat.name}
+                    Categories
                   </Link>
-                ))}
-                <div className="border-t border-border mt-2 pt-2">
-                  <Link href="/products?category=sale" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors block">Sale</Link>
+                  <button
+                    onClick={() => setMobileCatOpen(v => !v)}
+                    className="px-3 py-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Toggle categories"
+                  >
+                    <motion.span
+                      animate={{ rotate: mobileCatOpen ? 180 : 0 }}
+                      transition={{ duration: 0.22 }}
+                      className="inline-block"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </motion.span>
+                  </button>
                 </div>
+
+                {/* Expandable category list */}
+                <AnimatePresence initial={false}>
+                  {mobileCatOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden pl-3"
+                    >
+                      <div className="border-l-2 border-border pl-3 py-1 flex flex-col gap-0.5">
+                        {(categories ?? []).map(cat => (
+                          <Link
+                            key={cat.id}
+                            href={`/products?category=${cat.slug}`}
+                            className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            {cat.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <Link href="/products?category=sale" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Sale</Link>
               </nav>
             </SheetContent>
           </Sheet>
