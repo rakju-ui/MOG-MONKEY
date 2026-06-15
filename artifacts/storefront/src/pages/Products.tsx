@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useSearch } from "wouter";
 import { SlidersHorizontal, Search, X, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,52 +15,60 @@ import { Footer } from "@/components/layout/Footer";
 import { useListProducts, useListCategories, getListProductsQueryKey } from "@workspace/api-client-react";
 
 export default function Products() {
-  const [location] = useLocation();
+  const search = useSearch();
 
-  const getParams = () => new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const getParam = (key: string) => new URLSearchParams(search).get(key) ?? "";
 
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState(() => getParams().get("search") ?? "");
-  const [searchInput, setSearchInput] = useState(() => getParams().get("search") ?? "");
-  const [sort, setSort] = useState(() => getParams().get("sort") ?? "newest");
-  const [category, setCategory] = useState(() => getParams().get("category") ?? "");
+  const [searchInput, setSearchInput] = useState(() => getParam("search"));
+  const [submittedSearch, setSubmittedSearch] = useState(() => getParam("search"));
+  const [sort, setSort] = useState(() => getParam("sort") || "newest");
+  const [category, setCategory] = useState(() => getParam("category"));
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
-    const p = getParams();
-    const newCat = p.get("category") ?? "";
-    const newSearch = p.get("search") ?? "";
+    const newCat = getParam("category");
+    const newSearch = getParam("search");
     setCategory(newCat);
-    setSearch(newSearch);
+    setSubmittedSearch(newSearch);
     setSearchInput(newSearch);
     setPage(1);
-  }, [location]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   const { data: categories } = useListCategories();
   const { data, isLoading } = useListProducts(
-    { page, limit: 24, search: search || undefined, sort: sort as any, category: category || undefined, minPrice: priceRange[0] || undefined, maxPrice: priceRange[1] < 1000 ? priceRange[1] : undefined, inStock: inStockOnly || undefined },
-    { query: { queryKey: getListProductsQueryKey({ page, limit: 24, search: search || undefined, sort: sort as any, category: category || undefined }) } }
+    {
+      page, limit: 24,
+      search: submittedSearch || undefined,
+      sort: sort as any,
+      category: category || undefined,
+      minPrice: priceRange[0] || undefined,
+      maxPrice: priceRange[1] < 1000 ? priceRange[1] : undefined,
+      inStock: inStockOnly || undefined,
+    },
+    { query: { queryKey: getListProductsQueryKey({ page, limit: 24, search: submittedSearch || undefined, sort: sort as any, category: category || undefined }) } }
   );
 
   const totalPages = data ? Math.ceil(data.total / 24) : 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearch(searchInput);
+    setSubmittedSearch(searchInput);
     setPage(1);
   };
 
   const clearAll = () => {
     setCategory(""); setInStockOnly(false); setPriceRange([0, 1000]);
-    setSearch(""); setSearchInput(""); setPage(1);
+    setSubmittedSearch(""); setSearchInput(""); setPage(1);
   };
 
   const activeFilters = [
     category && categories?.find(c => c.slug === category)?.name,
     inStockOnly && "In Stock",
     priceRange[1] < 1000 && `Under $${priceRange[1]}`,
-    search && `"${search}"`,
+    submittedSearch && `"${submittedSearch}"`,
   ].filter(Boolean) as string[];
 
   const FilterPanel = () => (
@@ -80,7 +88,6 @@ export default function Products() {
               key={cat.id}
               onClick={() => { setCategory(cat.slug); setPage(1); }}
               className={`flex items-center justify-between w-full text-left text-sm py-1.5 px-2.5 rounded-lg transition-colors ${category === cat.slug ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
-              data-testid={`filter-category-${cat.slug}`}
             >
               <span>{cat.name}</span>
               <span className="text-xs opacity-50">{cat.productCount}</span>
@@ -116,7 +123,6 @@ export default function Products() {
         <Checkbox
           checked={inStockOnly}
           onCheckedChange={v => { setInStockOnly(!!v); setPage(1); }}
-          data-testid="filter-in-stock"
         />
         <div>
           <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">In stock only</span>
@@ -150,21 +156,16 @@ export default function Products() {
               {data.total} {data.total === 1 ? "product" : "products"}
             </p>
           )}
-        </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-6 md:py-8 flex-1">
-        {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-3 mb-5">
-          <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0 max-w-sm">
-            <div className="relative flex-1 min-w-0">
+          {/* Search bar — directly below title */}
+          <form onSubmit={handleSearch} className="flex gap-2 mt-4 max-w-lg">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
-                placeholder="Search products..."
-                className="pl-9 bg-muted/40 border-transparent focus-visible:border-border focus-visible:bg-background"
-                data-testid="input-search"
+                placeholder="Search products…"
+                className="pl-9 bg-background border-border"
               />
             </div>
             <Button type="submit" variant="outline" size="icon" className="flex-shrink-0">
@@ -172,7 +173,9 @@ export default function Products() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-2 ml-auto">
+          {/* Filters + Sort row — below search */}
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            {/* Mobile filter sheet trigger */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="md:hidden gap-2">
@@ -193,8 +196,9 @@ export default function Products() {
               </SheetContent>
             </Sheet>
 
+            {/* Sort */}
             <Select value={sort} onValueChange={v => { setSort(v); setPage(1); }}>
-              <SelectTrigger className="w-44 text-sm bg-muted/40 border-transparent" data-testid="select-sort">
+              <SelectTrigger className="w-44 text-sm bg-background border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -205,13 +209,8 @@ export default function Products() {
                 <SelectItem value="rating">Top rated</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        </div>
 
-        {/* Active filter chips */}
-        {activeFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-5">
-            <span className="text-xs text-muted-foreground">Filters:</span>
+            {/* Active filter chips */}
             {activeFilters.map(f => (
               <Badge key={f} variant="secondary" className="gap-1.5 pr-1 text-xs font-normal">
                 {f}
@@ -220,7 +219,7 @@ export default function Products() {
                   onClick={() => {
                     if (f === "In Stock") setInStockOnly(false);
                     else if (f.startsWith("Under")) setPriceRange([0, 1000]);
-                    else if (f.startsWith('"')) { setSearch(""); setSearchInput(""); }
+                    else if (f.startsWith('"')) { setSubmittedSearch(""); setSearchInput(""); }
                     else setCategory("");
                     setPage(1);
                   }}
@@ -229,15 +228,19 @@ export default function Products() {
                 </button>
               </Badge>
             ))}
-            <button onClick={clearAll} className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2">
-              Clear all
-            </button>
+            {activeFilters.length > 1 && (
+              <button onClick={clearAll} className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2">
+                Clear all
+              </button>
+            )}
           </div>
-        )}
+        </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-6 md:py-8 flex-1">
         <div className="flex gap-8">
           {/* Desktop sidebar */}
-          <aside className="hidden md:block w-52 flex-shrink-0 space-y-0">
+          <aside className="hidden md:block w-52 flex-shrink-0">
             <FilterPanel />
           </aside>
 
@@ -308,6 +311,7 @@ export default function Products() {
           </div>
         </div>
       </div>
+
       <Footer />
     </div>
   );
