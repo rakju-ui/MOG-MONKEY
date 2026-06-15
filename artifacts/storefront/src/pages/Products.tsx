@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { SlidersHorizontal, Search, X, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +15,27 @@ import { Footer } from "@/components/layout/Footer";
 import { useListProducts, useListCategories, getListProductsQueryKey } from "@workspace/api-client-react";
 
 export default function Products() {
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const [location] = useLocation();
+
+  const getParams = () => new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
 
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState(params.get("search") ?? "");
-  const [searchInput, setSearchInput] = useState(params.get("search") ?? "");
-  const [sort, setSort] = useState(params.get("sort") ?? "newest");
-  const [category, setCategory] = useState(params.get("category") ?? "");
+  const [search, setSearch] = useState(() => getParams().get("search") ?? "");
+  const [searchInput, setSearchInput] = useState(() => getParams().get("search") ?? "");
+  const [sort, setSort] = useState(() => getParams().get("sort") ?? "newest");
+  const [category, setCategory] = useState(() => getParams().get("category") ?? "");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState(false);
+
+  useEffect(() => {
+    const p = getParams();
+    const newCat = p.get("category") ?? "";
+    const newSearch = p.get("search") ?? "";
+    setCategory(newCat);
+    setSearch(newSearch);
+    setSearchInput(newSearch);
+    setPage(1);
+  }, [location]);
 
   const { data: categories } = useListCategories();
   const { data, isLoading } = useListProducts(

@@ -18,6 +18,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [mobileCatOpen, setMobileCatOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const sessionId = getCartSessionId();
 
@@ -56,7 +57,7 @@ export function Header() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           {/* Mobile menu */}
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
@@ -65,13 +66,14 @@ export function Header() {
             <SheetContent side="left" className="w-[300px]">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <nav className="flex flex-col gap-1 mt-8">
-                <Link href="/" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Home</Link>
-                <Link href="/products" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Shop</Link>
+                <Link href="/" onClick={() => setMobileOpen(false)} className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Home</Link>
+                <Link href="/products" onClick={() => setMobileOpen(false)} className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Shop</Link>
 
                 {/* Categories row: link + expand arrow */}
                 <div className="flex items-center rounded-lg hover:bg-muted transition-colors overflow-hidden">
                   <Link
                     href="/categories"
+                    onClick={() => setMobileOpen(false)}
                     className="flex-1 text-lg font-medium px-3 py-2.5"
                   >
                     Categories
@@ -106,6 +108,7 @@ export function Header() {
                           <Link
                             key={cat.id}
                             href={`/products?category=${cat.slug}`}
+                            onClick={() => setMobileOpen(false)}
                             className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground transition-colors"
                           >
                             {cat.name}
@@ -116,7 +119,7 @@ export function Header() {
                   )}
                 </AnimatePresence>
 
-                <Link href="/products?category=sale" className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Sale</Link>
+                <Link href="/products?category=sale" onClick={() => setMobileOpen(false)} className="text-lg font-medium px-3 py-2.5 rounded-lg hover:bg-muted transition-colors">Sale</Link>
               </nav>
             </SheetContent>
           </Sheet>
