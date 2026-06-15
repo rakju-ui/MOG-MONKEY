@@ -1,26 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   ShoppingBag, Search, Heart, User, Sun, Moon, 
-  Menu, X
+  Menu, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/components/ui/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useGetCart } from "@workspace/api-client-react";
+import { useGetCart, useListCategories } from "@workspace/api-client-react";
 import { getCartSessionId } from "@/lib/cart-session";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const [, setLocation] = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const catRef = useRef<HTMLDivElement>(null);
   const sessionId = getCartSessionId();
-  
-  const { data: cart } = useGetCart({ sessionId }, { 
-    query: { enabled: !!sessionId, queryKey: ["cart", sessionId] } 
+
+  const { data: cart } = useGetCart({ sessionId }, {
+    query: { enabled: !!sessionId, queryKey: ["cart", sessionId] }
   });
+  const { data: categories } = useListCategories();
 
   const itemCount = cart?.itemCount || 0;
 
@@ -28,6 +31,16 @@ export function Header() {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (catRef.current && !catRef.current.contains(e.target as Node)) {
+        setCatOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   return (
@@ -41,6 +54,7 @@ export function Header() {
     >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
+          {/* Mobile menu */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -49,45 +63,132 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px]">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <nav className="flex flex-col gap-4 mt-8">
-                <Link href="/" className="text-lg font-medium">Home</Link>
-                <Link href="/products" className="text-lg font-medium">Shop</Link>
-                <Link href="/products?sort=newest" className="text-lg font-medium">New Arrivals</Link>
-                <Link href="/products?category=sale" className="text-lg font-medium">Sale</Link>
+              <nav className="flex flex-col gap-1 mt-8">
+                <Link href="/" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors">Home</Link>
+                <Link href="/products" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors">Shop All</Link>
+                <div className="mt-2 mb-1 px-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Categories</p>
+                </div>
+                {(categories ?? []).map(cat => (
+                  <Link
+                    key={cat.id}
+                    href={`/products?category=${cat.slug}`}
+                    className="text-base font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+                <div className="border-t border-border mt-2 pt-2">
+                  <Link href="/products?category=sale" className="text-lg font-medium px-2 py-2 rounded-lg hover:bg-muted transition-colors block">Sale</Link>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
 
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png" alt="MØG MONKEY logo" className="h-8 w-8 object-contain" />
+            <img
+              src="https://res.cloudinary.com/do4wj3d1w/image/upload/v1781549823/09c9d320-fbee-4f05-8eea-85c18775c46c_t8k26u.png"
+              alt="MØG MONKEY logo"
+              className="h-8 w-8 object-contain"
+            />
             <span className="text-xl font-bold tracking-tighter">MØG MONKEY</span>
           </Link>
 
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            {["Shop", "New Arrivals", "Sale"].map((label, i) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link href="/products" className="hover:text-foreground transition-colors">
+                Shop
+              </Link>
+            </motion.div>
+
+            {/* Categories dropdown */}
+            <motion.div
+              ref={catRef}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.17, ease: [0.16, 1, 0.3, 1] }}
+              className="relative"
+              onMouseEnter={() => setCatOpen(true)}
+              onMouseLeave={() => setCatOpen(false)}
+            >
+              <button
+                className="flex items-center gap-1 hover:text-foreground transition-colors"
+                onClick={() => setCatOpen(v => !v)}
               >
-                <Link
-                  href={label === "Shop" ? "/products" : label === "New Arrivals" ? "/products?category=new" : "/products?category=sale"}
-                  className="hover:text-foreground transition-colors"
+                Categories
+                <motion.span
+                  animate={{ rotate: catOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  {label}
-                </Link>
-              </motion.div>
-            ))}
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </motion.span>
+              </button>
+
+              <AnimatePresence>
+                {catOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 bg-background border border-border rounded-xl shadow-xl overflow-hidden"
+                  >
+                    <motion.div
+                      initial="hidden"
+                      animate="show"
+                      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.04 } } }}
+                      className="py-1.5"
+                    >
+                      {(categories ?? []).map(cat => (
+                        <motion.div
+                          key={cat.id}
+                          variants={{
+                            hidden: { opacity: 0, x: -6 },
+                            show: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+                          }}
+                        >
+                          <Link
+                            href={`/products?category=${cat.slug}`}
+                            onClick={() => setCatOpen(false)}
+                            className="flex items-center justify-between px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors group"
+                          >
+                            <span>{cat.name}</span>
+                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                              {cat.productCount}
+                            </span>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link href="/products?category=sale" className="hover:text-foreground transition-colors">
+                Sale
+              </Link>
+            </motion.div>
           </nav>
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden lg:flex relative w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              type="search" 
-              placeholder="Search products..." 
+            <Input
+              type="search"
+              placeholder="Search products..."
               className="w-full pl-9 bg-muted/50 border-none focus-visible:bg-background"
             />
           </div>
